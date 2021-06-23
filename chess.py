@@ -1,15 +1,38 @@
-import time
-import speech_recognition as sr
+#!/usr/bin/env python3
+
+import argparse
+import os
+import queue
+import sounddevice as sd
+import vosk
+import sys
+
 from pynput.keyboard import Key, Controller
 
+q = queue.Queue()
 keyboard = Controller()
-#Função que altera nomes das peças por letras
+
+def int_or_str(text):
+    """Helper function for argument parsing."""
+    try:
+        return int(text)
+    except ValueError:
+        return text
+
+def callback(indata, frames, time, status):
+    """This is called (from a separate thread) for each audio block."""
+    if status:
+        print(status, file=sys.stderr)
+        print('oi')
+    q.put(bytes(indata))
+
 def nomes_pecas(frase):
     #Rei
     frase = frase.replace('rei', 'K')
     frase = frase.replace('hey', 'K')
     frase = frase.replace('real', 'K')
     frase = frase.replace('rey', 'K')
+    frase = frase.replace('majestade', 'K')
 
     #Dama 
     frase = frase.replace('dama', 'Q')
@@ -84,11 +107,18 @@ def roques(frase):
     if (frase =='roquegrande') or (frase =='rockgrande') or (frase =='roquegrand') or (frase =='rockgrand'):
         frase = frase.replace(frase, '0-0-0')
 
+        print (frase)
     return frase
 
 #Função que limpa a frase
 def limpar_frase(frase):
     frase = frase.replace(' ', '').lower()
+    frase = frase.replace('text', '')
+    frase = frase.replace('{', '')
+    frase = frase.replace('"', '')
+    frase = frase.replace('}', '')
+    frase = frase.replace(':', '')
+    frase = frase.strip()
     frase = nomes_pecas(frase)
     frase = numerais(frase)
     frase = nomes_colunas(frase)
@@ -97,47 +127,79 @@ def limpar_frase(frase):
 
     return frase
 
-# this is called from the background thread
-def callback(recognizer, audio):
-    # received audio data, now we'll recognize it using Google Speech Recognition
-    try:
-        print("Buscando...")
-        frase = recognizer.recognize_google(audio, language='pt-BR')
-        fraseLimpa = limpar_frase(frase)
-        if (frase == 'cancela'):
-            count = 0
-            while (count < 50):   
-                count = count + 1
-                keyboard.press(Key.backspace)
-                keyboard.release(Key.backspace)
-        else:
-            print(fraseLimpa)
-            keyboard.type(fraseLimpa)
-            keyboard.press(Key.enter)
-            keyboard.release(Key.enter)
-        
-    except sr.UnknownValueError:
-        print("Google Speech Recognition could not understand audio")
-    except sr.RequestError as e:
-        print("Could not request results from Google Speech Recognition service; {0}".format(e))
+parser = argparse.ArgumentParser(add_help=False)
+parser.add_argument(
+    '-l', '--list-devices', action='store_true',
+    help='show list of audio devices and exit')
+args, remaining = parser.parse_known_args()
+if args.list_devices:
+    print(sd.query_devices())
+    parser.exit(0)
+parser = argparse.ArgumentParser(
+    description=__doc__,
+    formatter_class=argparse.RawDescriptionHelpFormatter,
+    parents=[parser])
+parser.add_argument(
+    '-f', '--filename', type=str, metavar='FILENAME',
+    help='audio file to store recording to')
+parser.add_argument(
+    '-m', '--model', type=str, metavar='MODEL_PATH',
+    help='Path to the model')
+parser.add_argument(
+    '-d', '--device', type=int_or_str,
+    help='input device (numeric ID or substring)')
+parser.add_argument(
+    '-r', '--samplerate', type=int, help='sampling rate')
+args = parser.parse_args(remaining)
 
+try:
+    if args.model is None:
+        args.model = "model"
+    if not os.path.exists(args.model):
+        print ("Please download a model for your language from https://alphacephei.com/vosk/models")
+        print ("and unpack as 'model' in the current folder.")
+        parser.exit(0)
+    if args.samplerate is None:
+        device_info = sd.query_devices(args.device, 'input')
+        # soundfile expects an int, sounddevice provides a float:
+        args.samplerate = int(device_info['default_samplerate'])
 
-r = sr.Recognizer()
-#r.energy_threshold = 5000
-m = sr.Microphone()
-with m as source:
-    r.adjust_for_ambient_noise(source)  # we only need to calibrate once, before we start listening
-    print("Programa iniciado: ")
-# start listening in the background (note that we don't have to do this inside a `with` statement)
+    model = vosk.Model(args.model)
 
-stop_listening = r.listen_in_background(m, callback)
-# `stop_listening` is now a function that, when called, stops background listening
+    if args.filename:
+        dump_fn = open(args.filename, "wb")
+    else:
+        dump_fn = None
 
-# do some unrelated computations for 5 seconds
-for _ in range(50): time.sleep(0.1)  # we're still listening even though the main thread is doing other things
+    with sd.RawInputStream(samplerate=args.samplerate, blocksize = 8000, device=args.device, dtype='int16',
+                            channels=1, callback=callback):
+            print('#' * 80)
+            print('Press Ctrl+C to stop the recording')
+            print('#' * 80)
 
-# calling this function requests that the background listener stop listening
-#stop_listening(wait_for_stop=False)
+            rec = vosk.KaldiRecognizer(model, args.samplerate)
+            while True:
+                data = q.get()
+                if rec.AcceptWaveform(data):
+                    fraseLimpa = limpar_frase(rec.Result())
+                    if (fraseLimpa == 'cancela'):
+                        count = 0
+                        while (count < 50):   
+                            count = count + 1
+                            keyboard.press(Key.backspace)
+                            keyboard.release(Key.backspace)
+                    else:
+                        if (fraseLimpa != ''):
+                          print(fraseLimpa)
+                          keyboard.type(fraseLimpa)
+                          keyboard.press(Key.enter)
+                          keyboard.release(Key.enter)                    
+                if dump_fn is not None:
 
-# do some more unrelated things
-while True: time.sleep(0.1)  # we're not listening anymore, even though the background thread might still be running for a second or two while cleaning up and stopping
+                    dump_fn.write(data)
+
+except KeyboardInterrupt:
+    print('\nDone')
+    parser.exit(0)
+except Exception as e:
+    parser.exit(type(e).__name__ + ': ' + str(e))

@@ -53,9 +53,11 @@ def nomes_pecas(frase):
 def nomes_colunas(frase):
     frase = frase.replace('alfa', '1')
     frase = frase.replace('alpha', '1')
+    frase = frase.replace('abelha', '1')
 
     frase = frase.replace('beta', 'b')
     frase = frase.replace('bravo', 'b')
+    frase = frase.replace('brava', 'b')
 
     frase = frase.replace('charlie', 'c')   
     frase = frase.replace('casa', 'c')   
@@ -66,7 +68,7 @@ def nomes_colunas(frase):
     frase = frase.replace('eco', 'e')   
     frase = frase.replace('écom', 'e')   
     frase = frase.replace('escola', 'e')   
-    frase = frase.replace('estrela', 'e')   
+    frase = frase.replace('empresa', 'e')   
 
     frase = frase.replace('fogo', 'f')  
     frase = frase.replace('faca', 'f')  

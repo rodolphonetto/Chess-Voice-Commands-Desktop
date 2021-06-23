@@ -173,13 +173,13 @@ try:
     else:
         dump_fn = None
 
-    with sd.RawInputStream(samplerate=args.samplerate, blocksize = 8000, device=args.device, dtype='int16',
+    with sd.RawInputStream(samplerate=args.samplerate, blocksize = 4000, device=args.device, dtype='int16',
                             channels=1, callback=callback):
             print('#' * 80)
             print('Press Ctrl+C to stop the recording')
             print('#' * 80)
 
-            rec = vosk.KaldiRecognizer(model, args.samplerate)
+            rec = vosk.KaldiRecognizer(model, args.samplerate, '["cavalo bispo torre rei dama abelha bravo canal delta empresa faca gato hotel um hum dois tres quatro cinco seis sete oito roque pequeno grande", "[unk]"]')
             while True:
                 data = q.get()
                 if rec.AcceptWaveform(data):

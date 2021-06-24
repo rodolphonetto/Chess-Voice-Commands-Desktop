@@ -51,11 +51,11 @@ def nomes_pecas(frase):
     return frase
 
 def nomes_colunas(frase):
-    frase = frase.replace('alfa', '1')
-    frase = frase.replace('alpha', '1')
-    frase = frase.replace('abelha', '1')
+    frase = frase.replace('alfa', 'a')
+    frase = frase.replace('alpha', 'a')
+    frase = frase.replace('abelha', 'a')
 
-    frase = frase.replace('beta', 'b')
+    frase = frase.replace('bandeira', 'b')
     frase = frase.replace('bravo', 'b')
     frase = frase.replace('brava', 'b')
 
@@ -64,20 +64,18 @@ def nomes_colunas(frase):
 
     frase = frase.replace('delta', 'd')
     frase = frase.replace('disco', 'd')
-
-    frase = frase.replace('eco', 'e')   
-    frase = frase.replace('écom', 'e')   
-    frase = frase.replace('escola', 'e')   
+ 
     frase = frase.replace('empresa', 'e')   
-
-    frase = frase.replace('fogo', 'f')  
+ 
     frase = frase.replace('faca', 'f')  
 
     frase = frase.replace('gato', 'g') 
-    frase = frase.replace('gol', 'g') 
+    frase = frase.replace('groselha', 'g') 
 
     frase = frase.replace('hotel', 'h') 
     frase = frase.replace('hospital', 'h') 
+
+    frase = frase.replace('promove', '=')
 
     return frase
 
@@ -106,7 +104,7 @@ def roques(frase):
 
     if (frase == 'roquepequeno') or (frase == 'rockpequeno') or (frase == 'rackpequeno'):
         frase = frase.replace(frase, '0-0')
-    if (frase =='roquegrande') or (frase =='rockgrande') or (frase =='roquegrand') or (frase =='rockgrand'):
+    if (frase =='roquegrande') or (frase =='rockgrande') or (frase =='roquegrand') or (frase =='rockgrand') or (frase =='rockgrade'):
         frase = frase.replace(frase, '0-0-0')
 
         print (frase)
@@ -179,7 +177,7 @@ try:
             print('Press Ctrl+C to stop the recording')
             print('#' * 80)
 
-            rec = vosk.KaldiRecognizer(model, args.samplerate)
+            rec = vosk.KaldiRecognizer(model, args.samplerate,'["bispo cavalo rei dama torre abelha bandeira casa delta empresa faca groselha hotel rock pequeno grande promove hum um dois tres quatro cinco seis sete oito"]')
             while True:
                 data = q.get()
                 if rec.AcceptWaveform(data):

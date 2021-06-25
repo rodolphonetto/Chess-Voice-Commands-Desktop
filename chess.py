@@ -7,10 +7,9 @@ import sounddevice as sd
 import vosk
 import sys
 
-from pynput.keyboard import Key, Controller
+import keyboard
 
 q = queue.Queue()
-keyboard = Controller()
 
 def int_or_str(text):
     """Helper function for argument parsing."""
@@ -48,17 +47,17 @@ def nomes_colunas(frase):
 
     frase = frase.replace('bela', 'b')
 
-    frase = frase.replace('césar', 'c')   
+    frase = frase.replace('cesar', 'c')   
 
     frase = frase.replace('davi', 'd')
  
     frase = frase.replace('eva', 'e')   
  
-    frase = frase.replace('félix', 'f')  
+    frase = frase.replace('felix', 'f')  
 
     frase = frase.replace('gustavo', 'g') 
 
-    frase = frase.replace('héctor', 'h') 
+    frase = frase.replace('hector', 'h') 
 
     frase = frase.replace('promove', '=')
 
@@ -162,7 +161,7 @@ try:
             print('Press Ctrl+C to stop the recording')
             print('#' * 80)
 
-            rec = vosk.KaldiRecognizer(model, args.samplerate,'["bispo cavalo rei dama torre ana bela césar davi eva félix gustavo héctor rock pequeno grande promove hum um dois tres quatro cinco seis sete oito"]')
+            rec = vosk.KaldiRecognizer(model, args.samplerate,'["bispo cavalo rei dama torre ana bela cesar davi eva felix gustavo hector rock pequeno grande promove hum um dois tres quatro cinco seis sete oito"]')
             while True:
                 data = q.get()
                 if rec.AcceptWaveform(data):
@@ -171,14 +170,12 @@ try:
                         count = 0
                         while (count < 50):   
                             count = count + 1
-                            keyboard.press(Key.backspace)
-                            keyboard.release(Key.backspace)
+                            keyboard.press_and_release('enter') 
                     else:
                         if (fraseLimpa != ''):
                           print(fraseLimpa)
-                          keyboard.type(fraseLimpa)
-                          keyboard.press(Key.enter)
-                          keyboard.release(Key.enter)                    
+                          keyboard.write(fraseLimpa)
+                          keyboard.press_and_release('enter')                
                 if dump_fn is not None:
 
                     dump_fn.write(data)

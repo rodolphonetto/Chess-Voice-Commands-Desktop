@@ -29,16 +29,9 @@ def callback(indata, frames, time, status):
 def nomes_pecas(frase):
     #Rei
     frase = frase.replace('rei', 'K')
-    frase = frase.replace('hey', 'K')
-    frase = frase.replace('real', 'K')
-    frase = frase.replace('rey', 'K')
-    frase = frase.replace('majestade', 'K')
 
     #Dama 
     frase = frase.replace('dama', 'Q')
-    frase = frase.replace('drama', 'Q')
-    frase = frase.replace('damha', 'Q')
-    frase = frase.replace('dá1a', 'Q')
 
     #Torre 
     frase = frase.replace('torre', 'R')
@@ -51,29 +44,21 @@ def nomes_pecas(frase):
     return frase
 
 def nomes_colunas(frase):
-    frase = frase.replace('alfa', 'a')
-    frase = frase.replace('alpha', 'a')
-    frase = frase.replace('abelha', 'a')
+    frase = frase.replace('ana', 'a')
 
-    frase = frase.replace('bandeira', 'b')
-    frase = frase.replace('bravo', 'b')
-    frase = frase.replace('brava', 'b')
+    frase = frase.replace('bela', 'b')
 
-    frase = frase.replace('charlie', 'c')   
-    frase = frase.replace('casa', 'c')   
+    frase = frase.replace('césar', 'c')   
 
-    frase = frase.replace('delta', 'd')
-    frase = frase.replace('disco', 'd')
+    frase = frase.replace('davi', 'd')
  
-    frase = frase.replace('empresa', 'e')   
+    frase = frase.replace('eva', 'e')   
  
-    frase = frase.replace('faca', 'f')  
+    frase = frase.replace('félix', 'f')  
 
-    frase = frase.replace('gato', 'g') 
-    frase = frase.replace('groselha', 'g') 
+    frase = frase.replace('gustavo', 'g') 
 
-    frase = frase.replace('hotel', 'h') 
-    frase = frase.replace('hospital', 'h') 
+    frase = frase.replace('héctor', 'h') 
 
     frase = frase.replace('promove', '=')
 
@@ -177,7 +162,7 @@ try:
             print('Press Ctrl+C to stop the recording')
             print('#' * 80)
 
-            rec = vosk.KaldiRecognizer(model, args.samplerate,'["bispo cavalo rei dama torre abelha bandeira casa delta empresa faca groselha hotel rock pequeno grande promove hum um dois tres quatro cinco seis sete oito"]')
+            rec = vosk.KaldiRecognizer(model, args.samplerate,'["bispo cavalo rei dama torre ana bela césar davi eva félix gustavo héctor rock pequeno grande promove hum um dois tres quatro cinco seis sete oito"]')
             while True:
                 data = q.get()
                 if rec.AcceptWaveform(data):

@@ -6,7 +6,8 @@ import queue
 import sounddevice as sd
 import vosk
 import sys
-
+import tkinter
+import _thread
 import keyboard
 
 q = queue.Queue()
@@ -47,17 +48,17 @@ def nomes_colunas(frase):
 
     frase = frase.replace('bela', 'b')
 
-    frase = frase.replace('cesar', 'c')   
+    frase = frase.replace('césar', 'c')   
 
     frase = frase.replace('davi', 'd')
  
     frase = frase.replace('eva', 'e')   
  
-    frase = frase.replace('felix', 'f')  
+    frase = frase.replace('félix', 'f')  
 
     frase = frase.replace('gustavo', 'g') 
 
-    frase = frase.replace('hector', 'h') 
+    frase = frase.replace('heitor', 'h') 
 
     frase = frase.replace('promove', '=')
 
@@ -111,77 +112,120 @@ def limpar_frase(frase):
 
     return frase
 
-parser = argparse.ArgumentParser(add_help=False)
-parser.add_argument(
-    '-l', '--list-devices', action='store_true',
-    help='show list of audio devices and exit')
-args, remaining = parser.parse_known_args()
-if args.list_devices:
-    print(sd.query_devices())
-    parser.exit(0)
-parser = argparse.ArgumentParser(
-    description=__doc__,
-    formatter_class=argparse.RawDescriptionHelpFormatter,
-    parents=[parser])
-parser.add_argument(
-    '-f', '--filename', type=str, metavar='FILENAME',
-    help='audio file to store recording to')
-parser.add_argument(
-    '-m', '--model', type=str, metavar='MODEL_PATH',
-    help='Path to the model')
-parser.add_argument(
-    '-d', '--device', type=int_or_str,
-    help='input device (numeric ID or substring)')
-parser.add_argument(
-    '-r', '--samplerate', type=int, help='sampling rate')
-args = parser.parse_args(remaining)
-
-try:
-    if args.model is None:
-        args.model = "model"
-    if not os.path.exists(args.model):
-        print ("Please download a model for your language from https://alphacephei.com/vosk/models")
-        print ("and unpack as 'model' in the current folder.")
+def start_script():
+    parser = argparse.ArgumentParser(add_help=False)
+    parser.add_argument(
+        '-l', '--list-devices', action='store_true',
+        help='show list of audio devices and exit')
+    args, remaining = parser.parse_known_args()
+    if args.list_devices:
+        print(sd.query_devices())
         parser.exit(0)
-    if args.samplerate is None:
-        device_info = sd.query_devices(args.device, 'input')
-        # soundfile expects an int, sounddevice provides a float:
-        args.samplerate = int(device_info['default_samplerate'])
+    parser = argparse.ArgumentParser(
+        description=__doc__,
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+        parents=[parser])
+    parser.add_argument(
+        '-f', '--filename', type=str, metavar='FILENAME',
+        help='audio file to store recording to')
+    parser.add_argument(
+        '-m', '--model', type=str, metavar='MODEL_PATH',
+        help='Path to the model')
+    parser.add_argument(
+        '-d', '--device', type=int_or_str,
+        help='input device (numeric ID or substring)')
+    parser.add_argument(
+        '-r', '--samplerate', type=int, help='sampling rate')
+    args = parser.parse_args(remaining)
 
-    model = vosk.Model(args.model)
+    try:
+        if args.model is None:
+            args.model = "model"
+        if not os.path.exists(args.model):
+            print ("Please download a model for your language from https://alphacephei.com/vosk/models")
+            print ("and unpack as 'model' in the current folder.")
+            parser.exit(0)
+        if args.samplerate is None:
+            device_info = sd.query_devices(args.device, 'input')
+            # soundfile expects an int, sounddevice provides a float:
+            args.samplerate = int(device_info['default_samplerate'])
 
-    if args.filename:
-        dump_fn = open(args.filename, "wb")
-    else:
-        dump_fn = None
+        model = vosk.Model(args.model)
 
-    with sd.RawInputStream(samplerate=args.samplerate, blocksize = 8000, device=args.device, dtype='int16',
-                            channels=1, callback=callback):
-            print('#' * 80)
-            print('Press Ctrl+C to stop the recording')
-            print('#' * 80)
+        if args.filename:
+            dump_fn = open(args.filename, "wb")
+        else:
+            dump_fn = None
 
-            rec = vosk.KaldiRecognizer(model, args.samplerate,'["bispo cavalo rei dama torre ana bela cesar davi eva felix gustavo hector rock pequeno grande promove hum um dois tres quatro cinco seis sete oito"]')
-            while True:
-                data = q.get()
-                if rec.AcceptWaveform(data):
-                    fraseLimpa = limpar_frase(rec.Result())
-                    if (fraseLimpa == 'cancela'):
-                        count = 0
-                        while (count < 50):   
-                            count = count + 1
-                            keyboard.press_and_release('enter') 
-                    else:
-                        if (fraseLimpa != ''):
-                          print(fraseLimpa)
-                          keyboard.write(fraseLimpa)
-                          keyboard.press_and_release('enter')                
-                if dump_fn is not None:
+        with sd.RawInputStream(samplerate=args.samplerate, blocksize = 8000, device=args.device, dtype='int16',
+                                channels=1, callback=callback):
+                print('#' * 80)
+                print('Press Ctrl+C to stop the recording')
+                print('#' * 80)
 
-                    dump_fn.write(data)
+                rec = vosk.KaldiRecognizer(model, args.samplerate,'["bispo cavalo rei dama torre ana bela césar davi eva félix gustavo heitor rock pequeno grande promove cancela hum um dois tres quatro cinco seis sete oito"]')
+                while True:
+                    data = q.get()
+                    if rec.AcceptWaveform(data):
+                        fraseLimpa = limpar_frase(rec.Result())
+                        if (fraseLimpa == 'cancela'):
+                            count = 0
+                            while (count < 50):   
+                                count = count + 1
+                                keyboard.press_and_release('backspace') 
+                                last_move['text'] = 'Cancelado'
+                        else:
+                            if (fraseLimpa != ''):
+                                print(fraseLimpa)
+                                keyboard.write(fraseLimpa)
+                                keyboard.press_and_release('enter')
+                                last_move['text'] = fraseLimpa
+                    if dump_fn is not None:
 
-except KeyboardInterrupt:
-    print('\nDone')
-    parser.exit(0)
-except Exception as e:
-    parser.exit(type(e).__name__ + ': ' + str(e))
+                        dump_fn.write(data)
+
+    except KeyboardInterrupt:
+        print('\nDone')
+        parser.exit(0)
+    except Exception as e:
+        parser.exit(type(e).__name__ + ': ' + str(e))
+
+window = tkinter.Tk()
+
+window.title("Chess Voice Commands")
+window.geometry('700x400')
+
+label = tkinter.Label(window, text = "Bem vindo ao chess voice commands!").pack()
+
+tutorial = tkinter.Label(window, text = "Para entrar com um movimento fale o nome da peça, coluna e linha: Cavalo Ana 4", font=('',12))
+tutorial.place(x=10, y=70)
+
+tutorial_captura = tkinter.Label(window, text = "Caso a casa destino tenha uma peça adversária será feita a captura", font=('',12))
+tutorial_captura.place(x=10, y=100)
+
+tutorial_peoes = tkinter.Label(window, text = "Para avançar peões diga a coluna e a linha: Félix 4", font=('',12))
+tutorial_peoes.place(x=10, y=130)
+
+tutorial_peoes_captura = tkinter.Label(window, text = "Para capturar de peão diga a coluna do peão e o destino da captura: Félix Gustavo 5", font=('',12))
+tutorial_peoes_captura.place(x=10, y=160)
+
+tutorial_roques = tkinter.Label(window, text = "Para roques diga: Roque grande ou Roque pequeno", font=('',12))
+tutorial_roques.place(x=10, y=190)
+
+tutorial_promover = tkinter.Label(window, text = "Para promover diga a casa de promoção seguido de promove peça: Gustavo 8 promove dama", font=('',12))
+tutorial_promover.place(x=10, y=220)
+
+tutorial_apagar = tkinter.Label(window, text = "Para apagar movimentos errados diga: cancela", font=('',12))
+tutorial_apagar.place(x=10, y=250)
+
+tutorial_colunas = tkinter.Label(window, text = "Nomes das colunas: ana, bela, césar, davi, eva, félix, gustavo, heitor")
+tutorial_colunas.place(x=10, y=290)
+
+last_move_label = tkinter.Label(window, text='Último lance jogado:', font=('',12))
+last_move_label.place(x=200, y=350)
+
+last_move = tkinter.Label(window, text='-', font=('',48))
+last_move.place(x=350, y=320)
+
+_thread.start_new_thread(start_script,())
+window.mainloop()

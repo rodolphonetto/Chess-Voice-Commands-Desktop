@@ -58,7 +58,7 @@ def nomes_colunas(frase):
 
     frase = frase.replace('gustavo', 'g') 
 
-    frase = frase.replace('heitor', 'h') 
+    frase = frase.replace('héctor', 'h') 
 
     frase = frase.replace('promove', '=')
 
@@ -163,7 +163,7 @@ def start_script():
                 print('Press Ctrl+C to stop the recording')
                 print('#' * 80)
 
-                rec = vosk.KaldiRecognizer(model, args.samplerate,'["bispo cavalo rei dama torre ana bela césar davi eva félix gustavo heitor rock pequeno grande promove cancela hum um dois tres quatro cinco seis sete oito"]')
+                rec = vosk.KaldiRecognizer(model, args.samplerate,'["bispo cavalo rei dama torre ana bela césar davi eva félix gustavo héctor rock pequeno grande promove cancela hum um dois tres quatro cinco seis sete oito"]')
                 while True:
                     data = q.get()
                     if rec.AcceptWaveform(data):
@@ -218,7 +218,7 @@ tutorial_promover.place(x=10, y=220)
 tutorial_apagar = tkinter.Label(window, text = "Para apagar movimentos errados diga: cancela", font=('',12))
 tutorial_apagar.place(x=10, y=250)
 
-tutorial_colunas = tkinter.Label(window, text = "Nomes das colunas: ana, bela, césar, davi, eva, félix, gustavo, heitor")
+tutorial_colunas = tkinter.Label(window, text = "Nomes das colunas: ana, bela, césar, davi, eva, félix, gustavo, héctor")
 tutorial_colunas.place(x=10, y=290)
 
 last_move_label = tkinter.Label(window, text='Último lance jogado:', font=('',12))

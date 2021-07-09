@@ -5,7 +5,7 @@ block_cipher = None
 
 
 a = Analysis(['chess.py'],
-             pathex=['C:\\Users\\Rodolpho\\Desktop\\chess_voice'],
+             pathex=['C:\\Users\\Rodolpho\\Desktop\\Chess-Voice-Commands-Desktop'],
              binaries=[],
              datas=[('C:\\Users\\Rodolpho\\AppData\\Local\\Programs\\Python\\Python38\\Lib\\site-packages\\vosk', './vosk')],
              hiddenimports=[],
@@ -31,4 +31,4 @@ exe = EXE(pyz,
           upx=True,
           upx_exclude=[],
           runtime_tmpdir=None,
-          console=False )
+          console=False , icon='icon.ico')

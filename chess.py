@@ -6,7 +6,8 @@ import queue
 import sounddevice as sd
 import vosk
 import sys
-import tkinter
+from tkinter import *
+from PIL import ImageTk,Image
 import _thread
 import keyboard
 
@@ -190,42 +191,51 @@ def start_script():
     except Exception as e:
         parser.exit(type(e).__name__ + ': ' + str(e))
 
-window = tkinter.Tk()
+window = Tk()
 
 window.title("Chess Voice Commands")
-window.geometry('700x400')
+window.geometry('700x480')
+p1 = PhotoImage(file = 'icon.png')
+window.iconphoto(False, p1)
 
-label = tkinter.Label(window, text = "Bem vindo ao chess voice commands!").pack()
+canvas = Canvas(window, width = 100, height = 100)  
+canvas.place(x=30, y=10)
+img = ImageTk.PhotoImage(Image.open("icon.png"))  
+canvas.create_image(0, 0, anchor=NW, image=img) 
 
-tutorial = tkinter.Label(window, text = "Para entrar com um movimento fale o nome da peça, coluna e linha: Cavalo Ana 4", font=('',12))
-tutorial.place(x=10, y=70)
 
-tutorial_captura = tkinter.Label(window, text = "Caso a casa destino tenha uma peça adversária será feita a captura", font=('',12))
-tutorial_captura.place(x=10, y=100)
+label = Label(window, text = "Bem vindo ao chess voice commands!", font=('',22))
+label.place(x=150, y=45)
 
-tutorial_peoes = tkinter.Label(window, text = "Para avançar peões diga a coluna e a linha: Félix 4", font=('',12))
-tutorial_peoes.place(x=10, y=130)
+tutorial = Label(window, text = "Para entrar com um movimento fale o nome da peça, coluna e linha: Cavalo Ana 4", font=('',12))
+tutorial.place(x=10, y=130)
 
-tutorial_peoes_captura = tkinter.Label(window, text = "Para capturar de peão diga a coluna do peão e o destino da captura: Félix Gustavo 5", font=('',12))
-tutorial_peoes_captura.place(x=10, y=160)
+tutorial_captura = Label(window, text = "Caso a casa destino tenha uma peça adversária será feita a captura", font=('',12))
+tutorial_captura.place(x=10, y=160)
 
-tutorial_roques = tkinter.Label(window, text = "Para roques diga: Roque grande ou Roque pequeno", font=('',12))
-tutorial_roques.place(x=10, y=190)
+tutorial_peoes = Label(window, text = "Para avançar peões diga a coluna e a linha: Félix 4", font=('',12))
+tutorial_peoes.place(x=10, y=190)
 
-tutorial_promover = tkinter.Label(window, text = "Para promover diga a casa de promoção seguido de promove peça: Gustavo 8 promove dama", font=('',12))
-tutorial_promover.place(x=10, y=220)
+tutorial_peoes_captura = Label(window, text = "Para capturar de peão diga a coluna do peão e o destino da captura: Félix Gustavo 5", font=('',12))
+tutorial_peoes_captura.place(x=10, y=220)
 
-tutorial_apagar = tkinter.Label(window, text = "Para apagar movimentos errados diga: cancela", font=('',12))
-tutorial_apagar.place(x=10, y=250)
+tutorial_roques = Label(window, text = "Para roques diga: Roque grande ou Roque pequeno", font=('',12))
+tutorial_roques.place(x=10, y=250)
 
-tutorial_colunas = tkinter.Label(window, text = "Nomes das colunas: ana, bela, césar, davi, eva, félix, gustavo, héctor")
-tutorial_colunas.place(x=10, y=290)
+tutorial_promover = Label(window, text = "Para promover diga a casa de promoção seguido de promove peça: Gustavo 8 promove dama", font=('',12))
+tutorial_promover.place(x=10, y=280)
 
-last_move_label = tkinter.Label(window, text='Último lance jogado:', font=('',12))
-last_move_label.place(x=200, y=350)
+tutorial_apagar = Label(window, text = "Para apagar movimentos errados diga: cancela", font=('',12))
+tutorial_apagar.place(x=10, y=310)
 
-last_move = tkinter.Label(window, text='-', font=('',48))
-last_move.place(x=350, y=320)
+tutorial_colunas = Label(window, text = "Nomes das colunas: ana, bela, césar, davi, eva, félix, gustavo, héctor")
+tutorial_colunas.place(x=10, y=350)
+
+last_move_label = Label(window, text='Último lance jogado:', font=('',12))
+last_move_label.place(x=200, y=410)
+
+last_move = Label(window, text='-', font=('',48))
+last_move.place(x=350, y=380)
 
 _thread.start_new_thread(start_script,())
 window.mainloop()

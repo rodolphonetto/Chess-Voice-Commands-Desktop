@@ -195,12 +195,12 @@ window = Tk()
 
 window.title("Chess Voice Commands")
 window.geometry('700x480')
-p1 = PhotoImage(file = 'icon.png')
+p1 = PhotoImage(file = 'model/icon.png')
 window.iconphoto(False, p1)
 
 canvas = Canvas(window, width = 100, height = 100)  
 canvas.place(x=30, y=10)
-img = ImageTk.PhotoImage(Image.open("icon.png"))  
+img = ImageTk.PhotoImage(Image.open("model/icon.png"))  
 canvas.create_image(0, 0, anchor=NW, image=img) 
 
 

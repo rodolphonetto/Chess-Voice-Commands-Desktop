@@ -198,14 +198,11 @@ window.geometry('700x480')
 p1 = PhotoImage(file = 'model/icon.png')
 window.iconphoto(False, p1)
 
-canvas = Canvas(window, width = 100, height = 100)  
-canvas.place(x=30, y=10)
-img = ImageTk.PhotoImage(Image.open("model/icon.png"))  
-canvas.create_image(0, 0, anchor=NW, image=img) 
+canvas = Canvas(window, width = 400, height = 120)  
+canvas.place(x=170, y=10)
+img = ImageTk.PhotoImage(Image.open("model/logo.png"))  
+canvas.create_image(10, 0, anchor=NW, image=img) 
 
-
-label = Label(window, text = "Bem vindo ao chess voice commands!", font=('',22))
-label.place(x=150, y=45)
 
 tutorial = Label(window, text = "Para entrar com um movimento fale o nome da peça, coluna e linha: Cavalo Ana 4", font=('',12))
 tutorial.place(x=10, y=130)
@@ -232,10 +229,10 @@ tutorial_colunas = Label(window, text = "Nomes das colunas: ana, bela, césar, d
 tutorial_colunas.place(x=10, y=350)
 
 last_move_label = Label(window, text='Último lance jogado:', font=('',12))
-last_move_label.place(x=200, y=410)
+last_move_label.place(x=230, y=410)
 
 last_move = Label(window, text='-', font=('',48))
-last_move.place(x=350, y=380)
+last_move.place(x=380, y=380)
 
 _thread.start_new_thread(start_script,())
 window.mainloop()
